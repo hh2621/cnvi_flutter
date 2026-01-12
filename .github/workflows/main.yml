@@ -1,0 +1,40 @@
+name: Flutter CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use macos-latest for iOS builds
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4  # Uses actions/checkout version 4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        # Optional: Specify a specific version, e.g., '3.22.0'
+        # flutter-version: '3.24.3'
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Analyze project source
+      run: flutter analyze
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build Android APK
+      run: flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release.apk
+        path: build/app/outputs/flutter-apk/app-release.apk
